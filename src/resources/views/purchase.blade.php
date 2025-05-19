@@ -5,7 +5,7 @@
 
 <!-- css読み込み -->
 @section('css')
-<link rel="stylesheet" href="{{ asset('/css/purchase.css')  }}">
+<link rel="stylesheet" href="{{ asset('/css/purchase.css') }}">
 @endsection
 
 <!-- 本体 -->
@@ -13,15 +13,15 @@
 
 @include('components.header')
 <div class="container">
-    <form class="buy" id="stripe-form" action="/purchase/{{$item->id}}" method="post">
+    <form class="buy" id="stripe-form" action="/purchase/{{ $item->id }}" method="post">
         <div class="buy__left">
             <div class="item">
                 <div class="item__img">
-                    <img src="{{ \Storage::url($item->img_url) }}" alt="">
+                    <img src="{{ asset('img/' . basename($item->img_url)) }}" alt="{{ $item->name }}">
                 </div>
                 <div class="item__info">
-                    <h3 class="item__name">{{$item->name}}</h3>
-                    <p class="item__price">¥ {{number_format($item->price)}}</p>
+                    <h3 class="item__name">{{ $item->name }}</h3>
+                    <p class="item__price">¥ {{ number_format($item->price) }}</p>
                 </div>
             </div>
             <div class="purchases">
@@ -34,6 +34,7 @@
                         <option value="card">クレジットカード払い</option>
                     </select>
                 </div>
+
                 <div class="purchase">
                     <div class="purchase__flex">
                         <h3 class="purchase__title">配送先</h3>
@@ -52,6 +53,7 @@
                 </div>
             </div>
         </div>
+
         <div class="buy__right">
             <div class="buy__info">
                 <table>
@@ -76,6 +78,7 @@
         </div>
     </form>
 </div>
+
 <script src="https://js.stripe.com/v3/"></script>
 <script src="https://checkout.stripe.com/checkout.js"></script>
 <script src="{{ asset('js/purchase.js') }}"></script>
