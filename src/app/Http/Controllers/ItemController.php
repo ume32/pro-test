@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Storage;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ItemRequest;
@@ -10,6 +10,7 @@ use App\Models\Item;
 use App\Models\Category;
 use App\Models\Condition;
 use App\Models\CategoryItem;
+
 
 class ItemController extends Controller
 {
