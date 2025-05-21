@@ -26,40 +26,35 @@
                 <img class="icon" src="{{ asset('img/icon.png') }}" alt="ユーザー">
                 <p><strong>{{ $item->user->name }}</strong> さんとの取引画面</p>
             </div>
-            {{-- モーダル表示トリガー --}}
-            <button type="button" class="btn-complete" onclick="openModal()">取引を完了する</button>
+            @if (!session('rating_submitted'))
+                <button type="button" class="btn-complete" onclick="openModal()">取引を完了する</button>
+            @endif
         </div>
 
         <div class="trade-item">
             <img src="{{ asset('img/' . basename($item->img_url)) }}" class="item-image" alt="商品画像">
             <div>
-                <h2>{{ $item->name }}</h2>
-                <p>{{ number_format($item->price) }}円</p>
-
-                @if ($averageRating)
-                    <p class="average-rating">平均評価：
-                        @for ($i = 1; $i <= 5; $i++)
-                            <span class="star {{ $i <= round($averageRating) ? 'filled' : '' }}">★</span>
-                        @endfor
-                        ({{ number_format($averageRating, 1) }})
-                    </p>
-                @else
-                    <p class="average-rating">評価はまだありません。</p>
-                @endif
+                <h2 class="item-name">{{ $item->name }}</h2>
+                <p class="item-price">{{ number_format($item->price) }}円</p>
             </div>
         </div>
 
         <div class="trade-messages">
             @foreach ($messages as $message)
                 <div class="message {{ $message->user_id === auth()->id() ? 'my-message' : 'other-message' }}">
-                    <p class="user-name">{{ $message->user->name }}</p>
-                    <div class="message-body">
-                        @if ($message->message)
-                            <p>{{ $message->message }}</p>
-                        @endif
-                        @if ($message->image_path)
-                            <img src="{{ Storage::url($message->image_path) }}" class="message-image" alt="画像">
-                        @endif
+                    <div class="message-container">
+                        <img class="message-icon" src="{{ asset('img/icon.png') }}" alt="アイコン">
+                        <div>
+                            <p class="user-name">{{ $message->user->name }}</p>
+                            <div class="message-body">
+                                @if ($message->message)
+                                    <p>{{ $message->message }}</p>
+                                @endif
+                                @if ($message->image_path)
+                                    <img src="{{ Storage::url($message->image_path) }}" class="message-image" alt="画像">
+                                @endif
+                            </div>
+                        </div>
                     </div>
                     @if ($message->user_id === auth()->id())
                         <div class="actions">
@@ -74,20 +69,23 @@
         <form method="POST" action="{{ route('trade.store', ['item_id' => $item->id]) }}" enctype="multipart/form-data" class="trade-form">
             @csrf
             <input type="text" name="message" placeholder="取引メッセージを記入してください" value="{{ old('message') }}">
-            <input type="file" name="image">
-            <button type="submit" class="send-button">
+            <label class="file-label">
+                <span>画像を追加</span>
+                <input type="file" name="image">
+            </label>
+            <button type="submit" class="send-button-outside">
                 <img src="{{ asset('img/e99395e98ea663a8400f40e836a71b8c4e773b01.jpg') }}" alt="送信" class="send-icon">
             </button>
         </form>
     </div>
 </div>
 
-{{-- ✅ モーダル --}}
+{{-- モーダル --}}
 <div class="modal-overlay hidden" id="ratingModal">
     <div class="modal">
         <h2>取引が完了しました。</h2>
         <p>今回の取引相手はどうでしたか？</p>
-        <form method="POST" action="{{ route('trade.complete', ['item_id' => $item->id]) }}" onsubmit="return closeModalOnSubmit()">
+        <form method="POST" action="{{ route('trade.complete', ['item_id' => $item->id]) }}">
             @csrf
             <div class="stars">
                 @for ($i = 1; $i <= 5; $i++)
@@ -102,28 +100,20 @@
     </div>
 </div>
 
-{{-- ✅ JS処理 --}}
 <script>
     function openModal() {
-        const modal = document.getElementById('ratingModal');
-        if (modal) {
-            modal.classList.remove('hidden');
-        }
+        document.getElementById('ratingModal')?.classList.remove('hidden');
     }
 
-    function closeModalOnSubmit() {
-        // モーダルを即時非表示（見た目だけでも閉じたいとき）
-        const modal = document.getElementById('ratingModal');
-        if (modal) {
-            modal.classList.add('hidden');
-        }
-        return true; // フォーム送信はそのまま実行
-    }
-
-    @if (session('show_complete_modal'))
-        document.addEventListener('DOMContentLoaded', function () {
-            openModal();
+    document.addEventListener('DOMContentLoaded', () => {
+        const radios = document.querySelectorAll('.stars input[type="radio"]');
+        radios.forEach((radio, index) => {
+            radio.addEventListener('change', () => {
+                document.querySelectorAll('.stars .star').forEach((star, i) => {
+                    star.classList.toggle('filled', i < index + 1);
+                });
+            });
         });
-    @endif
+    });
 </script>
 @endsection

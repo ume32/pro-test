@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Item;
 use App\Models\TradeRating;
@@ -28,16 +27,14 @@ class TradeController extends Controller
                 : $item->user_id;
 
             TradeRating::create([
-                'item_id' => $item->id,
+                'item_id'  => $item->id,
                 'rater_id' => Auth::id(),
                 'ratee_id' => $rateeId,
-                'rating' => $request->rating,
+                'rating'   => $request->rating,
             ]);
         }
 
-        Session::flash('show_complete_modal', true);
-        Session::flash('rated_score', $request->rating);
-
-        return redirect()->route('trade.show', ['item_id' => $item->id]);
+        // ✅ 送信後はモーダルを再表示しないようリダイレクトだけ行う
+        return redirect()->route('trade.show', ['item_id' => $item->id])->with('rating_submitted', true);
     }
 }

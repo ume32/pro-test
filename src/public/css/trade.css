@@ -1,12 +1,12 @@
-/* ベース */
+/* ===== ベース設定 ===== */
 html,
 body {
-    height: 100%;
     margin: 0;
     padding: 0;
+    font-family: sans-serif;
 }
 
-/* 全体レイアウト */
+/* ===== 全体レイアウト ===== */
 .trade-container {
     display: flex;
     height: calc(100vh - 80px);
@@ -43,11 +43,11 @@ body {
 .trade-content {
     flex: 1;
     padding: 20px;
-    background-color: #ffffff;
+    background-color: #fff;
     border-left: 1px solid #ccc;
 }
 
-/* ヘッダー */
+/* ===== ヘッダー部分 ===== */
 .trade-header {
     display: flex;
     justify-content: space-between;
@@ -77,7 +77,7 @@ body {
     cursor: pointer;
 }
 
-/* 商品情報 */
+/* ===== 商品情報 ===== */
 .trade-item {
     display: flex;
     align-items: center;
@@ -93,7 +93,24 @@ body {
     object-fit: cover;
 }
 
-/* メッセージ */
+.item-name {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.item-price {
+    font-size: 18px;
+    color: #333;
+    margin-top: 4px;
+}
+
+/* ===== 平均評価（非表示） ===== */
+.average-rating {
+    display: none;
+}
+
+/* ===== メッセージ一覧 ===== */
 .trade-messages {
     max-height: 400px;
     overflow-y: auto;
@@ -101,40 +118,59 @@ body {
 }
 
 .message {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
-.my-message {
+.message-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.my-message .message-container {
+    flex-direction: row-reverse;
     text-align: right;
 }
 
-.other-message {
-    text-align: left;
+.message-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #ddd;
 }
 
 .user-name {
-    font-weight: bold;
-    margin-bottom: 5px;
+    font-size: 12px;
+    color: #333;
+    margin: 0 0 4px;
+    text-align: left;
+}
+
+.my-message .user-name {
+    text-align: right;
 }
 
 .message-body {
-    display: inline-block;
-    background-color: #dcdcdc;
+    background-color: #e0e0e0;
     padding: 10px;
     border-radius: 10px;
-    max-width: 60%;
-    text-align: left;
+    max-width: 280px;
+    word-break: break-word;
 }
 
 .message-image {
     max-width: 150px;
-    display: block;
     margin-top: 5px;
+    border-radius: 4px;
+    display: block;
 }
 
+/* ===== 編集・削除リンク ===== */
 .actions {
     font-size: 12px;
     color: #666;
+    margin-top: 5px;
+    text-align: right;
 }
 
 .actions a {
@@ -143,37 +179,47 @@ body {
     color: #666;
 }
 
-/* メッセージフォーム */
+/* ===== 入力フォーム（外部送信ボタン） ===== */
 .trade-form {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-top: 20px;
 }
 
 .trade-form input[type="text"] {
     flex: 1;
-    padding: 8px;
+    padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 20px;
+    font-size: 14px;
 }
 
-.trade-form input[type="file"] {
-    border: none;
-}
-
-.send-button {
-    background: none;
-    border: none;
+.file-label {
+    color: #ff6666;
+    font-weight: bold;
     cursor: pointer;
 }
 
-.send-icon {
-    width: 24px;
-    height: 24px;
+.file-label input {
+    display: none;
 }
 
-/* モーダル用スタイル */
-.trade-complete {
+/* 紙飛行機アイコンを外側に */
+.send-button-outside {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.send-icon {
+    width: 28px;
+    height: 28px;
+}
+
+/* ===== モーダル（評価） ===== */
+.modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -207,6 +253,7 @@ body {
     margin-bottom: 15px;
 }
 
+/* ===== スター評価エリア ===== */
 .stars {
     display: flex;
     justify-content: center;
@@ -225,11 +272,11 @@ body {
     transition: color 0.2s;
 }
 
-.stars input[type="radio"]:checked ~ .star,
-.stars label:hover .star {
+.stars .star.filled {
     color: #ffdd00;
 }
 
+/* ===== モーダル送信ボタン ===== */
 .btn-submit {
     background-color: #ff8c8c;
     color: white;
@@ -240,6 +287,7 @@ body {
     font-weight: bold;
 }
 
-.star.filled {
-    color: #ffd700;
+/* ===== 非表示ユーティリティ ===== */
+.hidden {
+    display: none;
 }
