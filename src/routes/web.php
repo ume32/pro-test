@@ -26,8 +26,8 @@ Route::get('/', [ItemController::class, 'index'])->name('items.list');
 Route::get('/item/{item}', [ItemController::class, 'detail'])->name('item.detail');
 Route::get('/item', [ItemController::class, 'search']);
 
-// ▼ 認証が必要なページ
-Route::middleware(['auth', 'verified'])->group(function () {
+// ▼ 認証が必要なページ（ミドルウェア：web, auth, verified）
+Route::middleware(['web', 'auth', 'verified'])->group(function () {
 
     // ▼ 出品・いいね・コメント
     Route::get('/sell', [ItemController::class, 'sellView']);
@@ -37,9 +37,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/item/comment/{item_id}', [CommentController::class, 'create']);
 
     // ▼ 購入フロー
-    Route::get('/purchase/{item_id}', [PurchaseController::class, 'index'])->middleware('purchase')->name('purchase.index');
-    Route::post('/purchase/{item_id}', [PurchaseController::class, 'purchase'])->middleware('purchase');
-    Route::get('/purchase/{item_id}/success', [PurchaseController::class, 'success']);
+    Route::get('/purchase/{item_id}', [PurchaseController::class, 'index'])
+        ->middleware('purchase')->name('purchase.index');
+    Route::post('/purchase/{item_id}', [PurchaseController::class, 'purchase'])
+        ->middleware('purchase');
+    Route::get('/purchase/{item_id}/success', [PurchaseController::class, 'success'])->name('purchase.success');
     Route::get('/purchase/address/{item_id}', [PurchaseController::class, 'address']);
     Route::post('/purchase/address/{item_id}', [PurchaseController::class, 'updateAddress']);
 
@@ -48,28 +50,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/mypage/profile', [UserController::class, 'profile']);
     Route::post('/mypage/profile', [UserController::class, 'updateProfile']);
 
-    // ▼ 取引チャット
+    // ▼ 取引チャット・メッセージ・完了・評価
     Route::get('/trade/{item_id}', [TradeMessageController::class, 'show'])->name('trade.show');
     Route::post('/trade/{item_id}', [TradeMessageController::class, 'store'])->name('trade.store');
     Route::post('/trade/{item_id}/complete', [TradeController::class, 'complete'])->name('trade.complete');
 });
 
-// ▼ 認証関連
-Route::post('login', [AuthenticatedSessionController::class, 'store'])->middleware('email');
+// ▼ Fortify認証（ログイン・登録）
+Route::post('/login', [AuthenticatedSessionController::class, 'store'])->middleware('email');
 Route::post('/register', [RegisteredUserController::class, 'store']);
 
-// ▼ メール認証
-Route::get('/email/verify', fn() => view('auth.verify-email'))->name('verification.notice');
+// ▼ メール認証画面（初回表示）
+Route::get('/email/verify', fn() => view('auth.verify-email'))
+    ->middleware('auth')
+    ->name('verification.notice');
 
+// ▼ メール認証通知送信
 Route::post('/email/verification-notification', function (Request $request) {
-    session()->get('unauthenticated_user')->sendEmailVerificationNotification();
-    session()->put('resent', true);
-    return back()->with('message', 'Verification link sent!');
-})->name('verification.send');
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('message', '認証リンクを送信しました。');
+})->middleware('auth')->name('verification.send');
 
+// ▼ メール認証処理
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
-    session()->forget('unauthenticated_user');
     return redirect('/mypage/profile');
-})->name('verification.verify');
-Route::get('/purchase/{item_id}/success', [PurchaseController::class, 'success'])->name('purchase.success');
+})->middleware(['auth', 'signed'])->name('verification.verify');
