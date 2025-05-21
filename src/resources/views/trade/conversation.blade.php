@@ -13,7 +13,8 @@
     <div class="sidebar">
         <p class="sidebar-title">その他の取引</p>
         @foreach ($dealingItems as $sideItem)
-            <a href="{{ route('trade.show', ['item_id' => $sideItem->id]) }}" class="sidebar-item {{ $item->id === $sideItem->id ? 'active' : '' }}">
+            <a href="{{ route('trade.show', ['item_id' => $sideItem->id]) }}"
+               class="sidebar-item {{ $item->id === $sideItem->id ? 'active' : '' }}">
                 {{ $sideItem->name }}
             </a>
         @endforeach
@@ -25,10 +26,8 @@
                 <img class="icon" src="{{ asset('img/icon.png') }}" alt="ユーザー">
                 <p><strong>{{ $item->user->name }}</strong> さんとの取引画面</p>
             </div>
-            <form method="POST" action="{{ route('trade.complete', ['item_id' => $item->id]) }}">
-                @csrf
-                <button class="btn-complete">取引を完了する</button>
-            </form>
+            {{-- モーダル表示トリガー --}}
+            <button type="button" class="btn-complete" onclick="openModal()">取引を完了する</button>
         </div>
 
         <div class="trade-item">
@@ -83,16 +82,17 @@
     </div>
 </div>
 
-<div class="modal-overlay hidden">
+{{-- ✅ モーダル --}}
+<div class="modal-overlay hidden" id="ratingModal">
     <div class="modal">
         <h2>取引が完了しました。</h2>
         <p>今回の取引相手はどうでしたか？</p>
-        <form action="{{ route('trade.complete', ['item_id' => $item->id]) }}" method="POST">
+        <form method="POST" action="{{ route('trade.complete', ['item_id' => $item->id]) }}" onsubmit="return closeModalOnSubmit()">
             @csrf
             <div class="stars">
                 @for ($i = 1; $i <= 5; $i++)
                     <label>
-                        <input type="radio" name="rating" value="{{ $i }}">
+                        <input type="radio" name="rating" value="{{ $i }}" required>
                         <span class="star">★</span>
                     </label>
                 @endfor
@@ -102,11 +102,28 @@
     </div>
 </div>
 
-@if (session('show_complete_modal'))
+{{-- ✅ JS処理 --}}
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelector('.modal-overlay')?.classList.remove('hidden');
-    });
+    function openModal() {
+        const modal = document.getElementById('ratingModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+    }
+
+    function closeModalOnSubmit() {
+        // モーダルを即時非表示（見た目だけでも閉じたいとき）
+        const modal = document.getElementById('ratingModal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+        return true; // フォーム送信はそのまま実行
+    }
+
+    @if (session('show_complete_modal'))
+        document.addEventListener('DOMContentLoaded', function () {
+            openModal();
+        });
+    @endif
 </script>
-@endif
 @endsection

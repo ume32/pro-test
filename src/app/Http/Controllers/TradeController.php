@@ -36,6 +36,7 @@ class TradeController extends Controller
         }
 
         Session::flash('show_complete_modal', true);
+        Session::flash('rated_score', $request->rating);
 
         return redirect()->route('trade.show', ['item_id' => $item->id]);
     }

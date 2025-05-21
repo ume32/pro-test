@@ -22,11 +22,7 @@ class UserController extends Controller
     public function updateProfile(ProfileRequest $request)
     {
         $img = $request->file('img_url');
-        if (isset($img)) {
-            $img_url = Storage::disk('local')->put('public/img', $img);
-        } else {
-            $img_url = '';
-        }
+        $img_url = isset($img) ? Storage::disk('local')->put('public/img', $img) : '';
 
         $profile = Profile::where('user_id', Auth::id())->first();
         if ($profile) {
@@ -47,35 +43,46 @@ class UserController extends Controller
             ]);
         }
 
-        User::find(Auth::id())->update([
-            'name' => $request->name
-        ]);
-
+        User::find(Auth::id())->update(['name' => $request->name]);
         return redirect('/');
     }
 
     public function mypage(Request $request)
     {
         $user = User::find(Auth::id());
-        $dealCount = 0; // 初期化
+        $dealCount = 0;
 
         if ($request->page === 'buy') {
-            $items = SoldItem::where('user_id', $user->id)->get()->map(function ($sold_item) {
-                return $sold_item->item;
-            });
-        } elseif ($request->page === 'deal') {
-            // 取引中の商品を取得（例: is_dealing フラグが true の場合）
-            $items = Item::where('user_id', $user->id)
-                ->where('is_dealing', true)
+            $items = SoldItem::where('user_id', $user->id)
                 ->get()
-                ->map(function ($item) {
-                    // unread_count が必要な場合の処理（例：unreadMessages() 関数）
-                    $item->unread_count = $item->unreadMessages()->count(); // モデルにリレーションが必要
-                    return $item;
-                });
+                ->map(fn($sold) => $sold->item);
+        } elseif ($request->page === 'deal') {
+            // 出品者としての取引中商品
+            $itemsAsSeller = Item::where('user_id', $user->id)
+                ->where('is_dealing', true)
+                ->with('tradeMessages')
+                ->get();
 
-            // 未読メッセージ数の合計
-            $dealCount = $items->sum('unread_count');
+            // 購入者としての取引中商品
+            $itemsAsBuyer = SoldItem::where('user_id', $user->id)
+                ->get()
+                ->filter(fn($sold) => $sold->item && $sold->item->is_dealing)
+                ->map(fn($sold) => $sold->item->load('tradeMessages'));
+
+            // マージして重複除去
+            $items = $itemsAsSeller->merge($itemsAsBuyer)->unique('id')->values();
+
+            foreach ($items as $item) {
+                // 未読件数
+                $item->unread_count = $item->unreadMessages()->count();
+                // 最新メッセージ時刻（null対応）
+                $item->latest_message_at = optional($item->tradeMessages->last())->created_at ?? $item->updated_at;
+                // 合計未読数
+                $dealCount += $item->unread_count;
+            }
+
+            // 最新メッセージが新しい順にソート
+            $items = $items->sortByDesc('latest_message_at')->values();
         } else {
             $items = Item::where('user_id', $user->id)->get();
         }

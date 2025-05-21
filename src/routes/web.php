@@ -72,3 +72,4 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
     session()->forget('unauthenticated_user');
     return redirect('/mypage/profile');
 })->name('verification.verify');
+Route::get('/purchase/{item_id}/success', [PurchaseController::class, 'success'])->name('purchase.success');

@@ -16,50 +16,44 @@ class PurchaseController extends Controller
 {
     public function index($item_id, Request $request)
     {
-        $item = Item::find($item_id);
+        $item = Item::findOrFail($item_id);
         $user = User::find(Auth::id());
         return view('purchase', compact('item', 'user'));
     }
 
     public function purchase($item_id, Request $request)
     {
-        $item = Item::find($item_id);
-        $stripe = new StripeClient(config('stripe.stripe_secret_key'));
+        $item = Item::findOrFail($item_id);
+        $stripe = new StripeClient(config('services.stripe.secret'));
 
-        [
-            $user_id,
-            $amount,
-            $sending_postcode,
-            $sending_address,
-            $sending_building
-        ] = [
-            Auth::id(),
-            $item->price,
-            $request->destination_postcode,
-
-            urlencode($request->destination_address),
-            urlencode($request->destination_building) ?? null
-        ];
+        $user_id = Auth::id();
+        $amount = $item->price;
+        $sending_postcode = $request->destination_postcode;
+        $sending_address = urlencode($request->destination_address);
+        $sending_building = urlencode($request->destination_building ?? '');
 
         $checkout_session = $stripe->checkout->sessions->create([
             'payment_method_types' => [$request->payment_method],
             'payment_method_options' => [
-                'konbini' => [
-                    'expires_after_days' => 7,
-                ],
+                'konbini' => ['expires_after_days' => 7],
             ],
-            'line_items' => [
-                [
-                    'price_data' => [
-                        'currency' => 'jpy',
-                        'product_data' => ['name' => $item->name],
-                        'unit_amount' => $item->price,
-                    ],
-                    'quantity' => 1,
+            'line_items' => [[
+                'price_data' => [
+                    'currency' => 'jpy',
+                    'product_data' => ['name' => $item->name],
+                    'unit_amount' => $item->price,
                 ],
-            ],
+                'quantity' => 1,
+            ]],
             'mode' => 'payment',
-            'success_url' => "http://localhost/purchase/{$item_id}/success?user_id={$user_id}&amount={$amount}&sending_postcode={$sending_postcode}&sending_address={$sending_address}&sending_building={$sending_building}",
+            'success_url' => route('purchase.success', [
+                'item_id' => $item_id,
+                'user_id' => $user_id,
+                'amount' => $amount,
+                'sending_postcode' => $sending_postcode,
+                'sending_address' => $sending_address,
+                'sending_building' => $sending_building,
+            ]),
         ]);
 
         return redirect($checkout_session->url);
@@ -67,19 +61,22 @@ class PurchaseController extends Controller
 
     public function success($item_id, Request $request)
     {
-        //無事決済が成功した後に動くメソッドのため、決済以外でHTTPリクエストが送られた時用にクエリパラメータを検閲
+        // 必要なクエリパラメータがあるか確認
         if (!$request->user_id || !$request->amount || !$request->sending_postcode || !$request->sending_address) {
-            throw new Exception("You need all Query Parameters (user_id, amount, sending_postcode, sending_address)");
+            throw new Exception("Missing query parameters");
         }
 
-        $stripe = new StripeClient(config('stripe.stripe_secret_key'));
+        $item = Item::findOrFail($item_id);
+        $stripe = new StripeClient(config('services.stripe.secret'));
 
+        // 決済を最終確認（実際の運用では Webhook を使うべき）
         $stripe->charges->create([
             'amount' => $request->amount,
             'currency' => 'jpy',
-            'source' => 'tok_visa',
+            'source' => 'tok_visa', // テスト用トークン
         ]);
 
+        // 購入履歴に登録
         SoldItem::create([
             'user_id' => $request->user_id,
             'item_id' => $item_id,
@@ -87,6 +84,10 @@ class PurchaseController extends Controller
             'sending_address' => $request->sending_address,
             'sending_building' => $request->sending_building ?? null,
         ]);
+
+        // ★ is_dealing を true に更新 → 取引中フラグ
+        $item->is_dealing = true;
+        $item->save();
 
         return redirect('/')->with('flashSuccess', '決済が完了しました！');
     }
@@ -99,8 +100,8 @@ class PurchaseController extends Controller
 
     public function updateAddress(AddressRequest $request)
     {
-
         $user = User::find(Auth::id());
+
         Profile::where('user_id', $user->id)->update([
             'postcode' => $request->postcode,
             'address' => $request->address,
