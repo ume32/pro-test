@@ -49,42 +49,42 @@ class UserController extends Controller
 
     public function mypage(Request $request)
     {
-        $user = User::find(Auth::id());
-        $dealCount = 0;
+        $user = User::withAvg('receivedRatings', 'rating')->find(Auth::id());
 
+        // ✅ 常に dealCount を算出（出品者 + 購入者 両方）
+        $itemsAsSeller = Item::where('user_id', $user->id)
+            ->where('is_dealing', true)
+            ->get();
+
+        $itemsAsBuyer = SoldItem::where('user_id', $user->id)
+            ->get()
+            ->filter(fn($sold) => $sold->item && $sold->item->is_dealing)
+            ->map(fn($sold) => $sold->item);
+
+        $allDealItems = $itemsAsSeller->merge($itemsAsBuyer)->unique('id');
+
+        $dealCount = $allDealItems->sum(fn($item) => $item->unreadMessages()->count());
+
+        // 表示する items の切り替え
         if ($request->page === 'buy') {
             $items = SoldItem::where('user_id', $user->id)
                 ->get()
                 ->map(fn($sold) => $sold->item);
         } elseif ($request->page === 'deal') {
-            // 出品者としての取引中商品
-            $itemsAsSeller = Item::where('user_id', $user->id)
-                ->where('is_dealing', true)
-                ->with('tradeMessages')
-                ->get();
-
-            // 購入者としての取引中商品
-            $itemsAsBuyer = SoldItem::where('user_id', $user->id)
-                ->get()
-                ->filter(fn($sold) => $sold->item && $sold->item->is_dealing)
-                ->map(fn($sold) => $sold->item->load('tradeMessages'));
-
-            // マージして重複除去
-            $items = $itemsAsSeller->merge($itemsAsBuyer)->unique('id')->values();
-
-            foreach ($items as $item) {
-                // 未読件数
+            $items = $allDealItems->map(function ($item) {
                 $item->unread_count = $item->unreadMessages()->count();
-                // 最新メッセージ時刻（null対応）
                 $item->latest_message_at = optional($item->tradeMessages->last())->created_at ?? $item->updated_at;
-                // 合計未読数
-                $dealCount += $item->unread_count;
-            }
-
-            // 最新メッセージが新しい順にソート
-            $items = $items->sortByDesc('latest_message_at')->values();
+                return $item;
+            })->sortByDesc('latest_message_at')->values();
         } else {
             $items = Item::where('user_id', $user->id)->get();
+        }
+
+        // 表示しているアイテムにも unread_count を追加しておく（画像側で表示用）
+        foreach ($items as $item) {
+            if (method_exists($item, 'unreadMessages') && !isset($item->unread_count)) {
+                $item->unread_count = $item->unreadMessages()->count();
+            }
         }
 
         return view('mypage', compact('user', 'items', 'dealCount'));

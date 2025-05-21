@@ -34,9 +34,29 @@
     margin-bottom: 5px;
 }
 
+/* ★ 評価用星スタイル */
 .user__rating .star {
     font-size: 20px;
-    color: #ffcc00;
+    color: #ccc; /* グレー */
+}
+
+.user__rating .star.filled {
+    color: #ffcc00; /* 黄色 */
+}
+
+.mypage__user--btn .btn2 {
+    padding: 10px 20px;
+    border: 1px solid #f66;
+    border-radius: 6px;
+    color: #f66;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.mypage__user--btn .btn2:hover {
+    background-color: #f66;
+    color: white;
 }
 
 .border__list {
@@ -97,7 +117,7 @@
     object-fit: cover;
 }
 
-/* ▼ FN005: 未読バッジ 左上 */
+/* ✅ FN005: 左上の未読バッジ */
 .notify-top {
     position: absolute;
     top: 5px;

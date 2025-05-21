@@ -22,10 +22,10 @@
             </div>
             <div>
                 <p class="user__name">{{ $user->name }}</p>
-                @if ($user->rating)
+                @if ($user->received_ratings_avg_rating) {{-- 評価があるときだけ表示 --}}
                     <p class="user__rating">
                         @for ($i = 1; $i <= 5; $i++)
-                            <span class="star">{{ $i <= round($user->rating) ? '★' : '☆' }}</span>
+                            <span class="star {{ $i <= round($user->received_ratings_avg_rating) ? 'filled' : '' }}">★</span>
                         @endfor
                     </p>
                 @endif
@@ -56,7 +56,7 @@
     </div>
 
     <div class="items">
-        @foreach ($items->sortByDesc('latest_message_at') as $item)  {{-- ★ FN004: 最新メッセージ順にソート --}}
+        @foreach ($items as $item)
             <div class="item">
                 @if (request('page') === 'deal')
                     <a href="{{ route('trade.show', ['item_id' => $item->id]) }}">
@@ -64,9 +64,7 @@
                     <a href="/item/{{ $item->id }}">
                 @endif
                         <div class="item__img--container">
-                            {{-- ★ 画像 --}}
                             <img src="{{ asset('img/' . basename($item->img_url)) }}" class="item__img" alt="商品画像">
-
                             @if (isset($item->unread_count) && $item->unread_count > 0)
                                 <span class="notify-top">{{ $item->unread_count }}</span>
                             @endif
