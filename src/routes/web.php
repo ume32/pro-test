@@ -54,6 +54,11 @@ Route::middleware(['web', 'auth', 'verified'])->group(function () {
     Route::get('/trade/{item_id}', [TradeMessageController::class, 'show'])->name('trade.show');
     Route::post('/trade/{item_id}', [TradeMessageController::class, 'store'])->name('trade.store');
     Route::post('/trade/{item_id}/complete', [TradeController::class, 'complete'])->name('trade.complete');
+
+    // ▼ メッセージ編集・削除（※bladeで使用する route('trade.edit') に対応）
+    Route::get('/trade/message/{message}/edit', [TradeMessageController::class, 'edit'])->name('trade.edit');
+    Route::patch('/trade/message/{message}', [TradeMessageController::class, 'update'])->name('trade.update');
+    Route::delete('/trade/message/{message}', [TradeMessageController::class, 'destroy'])->name('trade.destroy');
 });
 
 // ▼ Fortify認証（ログイン・登録）

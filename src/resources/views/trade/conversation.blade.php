@@ -54,6 +54,18 @@
                                     <img src="{{ asset($message->image_path) }}" class="message-image" alt="画像">
                                 @endif
                             </div>
+
+                            @if ($message->user_id === auth()->id())
+                                <div class="actions">
+                                    <a href="{{ route('trade.edit', $message->id) }}">編集</a>
+                                    <form method="POST" action="{{ route('trade.destroy', $message->id) }}" style="display:inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="delete-btn">削除</button>
+                                    </form>
+                                </div>
+                            @endif
+
                         </div>
                     </div>
                 </div>
@@ -72,7 +84,7 @@
         @endif
 
         {{-- メッセージ投稿フォーム --}}
-        <form method="POST" action="{{ route('trade.store', ['item_id' => $item->id]) }}" enctype="multipart/form-data" class="trade-form">
+        <form method="POST" action="{{ route('trade.store', ['item_id' => $item->id]) }}" enctype="multipart/form-data" class="trade-form" id="messageForm">
             @csrf
             <input type="text" name="message" placeholder="取引メッセージを記入してください" value="">
 
@@ -117,7 +129,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        // 星評価のスクリプト
         const radios = document.querySelectorAll('.stars input[type="radio"]');
         radios.forEach((radio, index) => {
             radio.addEventListener('change', () => {
@@ -127,7 +138,6 @@
             });
         });
 
-        // ファイルプレビュー
         const input = document.getElementById('imageInput');
         const fileName = document.getElementById('file-name');
         const preview = document.getElementById('preview');
@@ -147,7 +157,6 @@
             }
         });
 
-        // ✅ 自動スクロール：一番下へ
         const messageContainer = document.getElementById('tradeMessages');
         if (messageContainer) {
             messageContainer.scrollTop = messageContainer.scrollHeight;

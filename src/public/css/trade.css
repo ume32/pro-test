@@ -4,6 +4,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: sans-serif;
+    height: 100%;
 }
 
 /* ===== 全体レイアウト ===== */
@@ -17,6 +18,7 @@ body {
     background-color: #7a7a7a;
     padding: 20px 10px;
     color: white;
+    overflow-y: auto;
 }
 
 .sidebar-title {
@@ -42,9 +44,12 @@ body {
 
 .trade-content {
     flex: 1;
-    padding: 20px;
+    display: flex;
+    flex-direction: column;
     background-color: #fff;
     border-left: 1px solid #ccc;
+    padding: 20px;
+    overflow: hidden;
 }
 
 /* ===== ヘッダー部分 ===== */
@@ -105,16 +110,12 @@ body {
     margin-top: 4px;
 }
 
-/* ===== 平均評価（非表示） ===== */
-.average-rating {
-    display: none;
-}
-
 /* ===== メッセージ一覧 ===== */
 .trade-messages {
-    max-height: 400px;
+    flex: 1;
     overflow-y: auto;
-    margin-bottom: 20px;
+    padding-right: 10px;
+    margin-bottom: 10px;
 }
 
 .message {
@@ -161,7 +162,6 @@ body {
     text-align: left;
 }
 
-/* 画像表示 */
 .message-image {
     max-width: 150px;
     margin-top: 5px;
@@ -177,18 +177,29 @@ body {
     text-align: right;
 }
 
-.actions a {
+.actions a,
+.actions .delete-btn {
     margin-left: 10px;
     text-decoration: none;
     color: #666;
+    background: none;
+    border: none;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
 }
 
-/* ===== 入力フォーム（外部送信ボタン） ===== */
+/* ===== 入力フォーム（下部固定） ===== */
 .trade-form {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-top: 20px;
+    padding: 10px;
+    background: #fff;
+    border-top: 1px solid #ccc;
+    position: sticky;
+    bottom: 0;
 }
 
 .trade-form input[type="text"] {
@@ -216,7 +227,6 @@ body {
     font-style: italic;
 }
 
-/* 画像プレビュー */
 .preview-image {
     max-width: 150px;
     margin-top: 10px;
@@ -224,7 +234,6 @@ body {
     border-radius: 4px;
 }
 
-/* 紙飛行機アイコンを外側に */
 .send-button-outside {
     background: none;
     border: none;
@@ -237,7 +246,7 @@ body {
     height: 28px;
 }
 
-/* ===== モーダル（評価） ===== */
+/* ===== モーダル ===== */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -272,7 +281,7 @@ body {
     margin-bottom: 15px;
 }
 
-/* ===== スター評価エリア ===== */
+/* ===== スター評価 ===== */
 .stars {
     display: flex;
     justify-content: center;

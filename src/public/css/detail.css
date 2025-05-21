@@ -1,201 +1,254 @@
-.item{
-    display: flex;
-    justify-content: space-around;
+/* ===== ベース設定 ===== */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
 }
 
-.item__img{
-    width: 450px;
-    height: 550px;
+/* ===== 商品詳細画面レイアウト ===== */
+.item {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 商品画像 */
+.item__img {
+    width: 48%;
+    min-width: 300px;
+    height: auto;
     background-color: rgb(208, 208, 208);
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.sold{
+.item__img img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+/* SOLD ラベル */
+.sold {
     position: relative;
 }
 
 .sold::before {
     content: "";
+    position: absolute;
     top: 0;
     left: 0;
     border-bottom: 6em solid transparent;
     border-left: 6em solid #c12748;
-    position: absolute;
     z-index: 100;
 }
+
 .sold::after {
     content: "Sold";
-    display: block;
+    position: absolute;
     top: 20px;
+    left: 5px;
     font-size: 20px;
     font-weight: bold;
     transform: rotate(-45deg);
     color: #fff;
-    left: 5px;
-    position: absolute;
     z-index: 101;
 }
 
-.item__info{
-    width: 450px;
-    height: 75vh;
-    overflow-y: scroll;
+/* 商品情報エリア */
+.item__info {
+    width: 48%;
+    min-width: 300px;
+    max-height: 75vh;
+    overflow-y: auto;
+    padding: 10px;
 }
 
-.item__info::-webkit-scrollbar{
+.item__info::-webkit-scrollbar {
     display: none;
 }
 
-.item__name{
+/* 商品名・価格など */
+.item__name {
     font-size: 36px;
     margin-bottom: 30px;
 }
 
-.item__price{
+.item__price {
     font-size: 24px;
     margin-bottom: 30px;
 }
 
-.item__form{
+/* ボタン関連 */
+.item__form {
     display: flex;
 }
 
-.item__like{
+.item__like {
     margin-left: 30px;
     text-align: center;
 }
 
-.like__count{
+.like__count {
     margin-top: 10px;
 }
 
-.item__comment{
+.item__comment {
     margin-left: 40px;
     text-align: center;
 }
 
-.item__comment a{
+.item__comment a {
     width: fit-content;
 }
 
-.comment__count{
+.comment__count {
     margin-top: 10px;
 }
 
-.item__purchase{
+.item__purchase {
     margin-top: 30px;
 }
 
-.item__section{
+.item__section {
     margin: 30px 0;
     font-size: 24px;
 }
 
-.item__table th{
+.item__table th {
     width: fit-content;
     white-space: nowrap;
     padding: 30px 50px 30px 0;
 }
 
-.item__table-category{
+.item__table-category {
     display: flex;
     flex-wrap: wrap;
 }
 
-.item__table li{
+.item__table li {
     padding: 5px 15px;
     border-radius: 15px;
-    background-color: #D9D9D9;
+    background-color: #d9d9d9;
     margin: 5px;
 }
 
-.comment_section{
+/* ===== コメント関連 ===== */
+.comment_section {
     margin-top: 50px;
 }
 
-.comment_section h3{
+.comment_section h3 {
     font-size: 24px;
     color: #666666;
 }
 
-.comments{
+.comments {
     margin-top: 30px;
 }
 
-.comment{
+.comment {
     margin-top: 30px;
 }
 
-.comment:first-child{
+.comment:first-child {
     margin-top: 0;
 }
 
-.comment__user{
+.comment__user {
     display: flex;
     align-items: center;
 }
 
-.user__img{
+.user__img {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: #D9D9D9;
+    background-color: #d9d9d9;
     display: flex;
     align-items: center;
     overflow: hidden;
 }
 
-.user__name{
+.user__name {
     margin-left: 8px;
     font-weight: bold;
 }
 
-.comment__content{
+.comment__content {
     margin-top: 10px;
-    background-color: #D9D9D9;
+    background-color: #d9d9d9;
     border-radius: 5px;
-    width: 450px;
+    width: 100%;
+    max-width: 450px;
     overflow-wrap: break-word;
     padding: 15px;
 }
 
-.comment__form{
+/* コメントフォーム */
+.comment__form {
     margin-top: 40px;
 }
 
-.comment__form-title{
+.comment__form-title {
     font-weight: bold;
 }
 
-.comment__form-textarea{
-    width: 450px;
+.comment__form-textarea {
+    width: 100%;
+    max-width: 450px;
     height: 150px;
     overflow-y: scroll;
     margin-top: 10px;
     padding: 10px;
 }
 
-.comment__form-btn{
+.comment__form-btn {
     margin-top: 30px;
 }
 
+/* ===== レスポンシブ対応 ===== */
+
+/* タブレット：768px〜850px */
 @media (min-width: 768px) and (max-width: 850px) {
-    .item__img {
-        width: 45vw;
+    .item {
+        flex-direction: column;
+        align-items: center;
     }
-    
+
+    .item__img,
     .item__info {
-        width: 45vw;
+        width: 90%;
     }
 
     .item__purchase,
-    .comment__form-btn {
+    .comment__form-btn,
+    .comment__form-textarea {
+        width: 100%;
+    }
+}
+
+/* スマホ：〜767px（任意） */
+@media (max-width: 767px) {
+    .item {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .item__img,
+    .item__info,
+    .comment__form-textarea {
         width: 100%;
     }
 
-    .comment__form-textarea {
+    .comment__form-btn {
         width: 100%;
     }
 }
