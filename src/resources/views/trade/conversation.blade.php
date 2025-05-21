@@ -9,6 +9,13 @@
 @section('content')
 @include('components.header')
 
+@php
+    $isBuyer = optional($item->soldItem)->user_id === Auth::id();
+    $partnerName = $isBuyer
+        ? $item->user->name
+        : optional($item->soldItem)->user->name;
+@endphp
+
 <div class="trade-container">
     <div class="sidebar">
         <p class="sidebar-title">その他の取引</p>
@@ -24,9 +31,9 @@
         <div class="trade-header">
             <div class="trade-user">
                 <img class="icon" src="{{ asset('img/icon.png') }}" alt="ユーザー">
-                <p><strong>{{ $item->user->name }}</strong> さんとの取引画面</p>
+                <p><strong>{{ $partnerName }}</strong> さんとの取引画面</p>
             </div>
-            @if (!session('rating_submitted'))
+            @if ($isBuyer && !session('rating_submitted'))
                 <button type="button" class="btn-complete" onclick="openModal()">取引を完了する</button>
             @endif
         </div>
@@ -65,7 +72,6 @@
                                     </form>
                                 </div>
                             @endif
-
                         </div>
                     </div>
                 </div>
@@ -87,15 +93,12 @@
         <form method="POST" action="{{ route('trade.store', ['item_id' => $item->id]) }}" enctype="multipart/form-data" class="trade-form" id="messageForm">
             @csrf
             <input type="text" name="message" placeholder="取引メッセージを記入してください" value="">
-
             <label class="file-label">
                 <span>画像を追加</span>
                 <input type="file" name="image" id="imageInput">
             </label>
-
             <span id="file-name" class="file-name"></span>
             <img id="preview" class="preview-image" style="display:none;" alt="画像プレビュー">
-
             <button type="submit" class="send-button-outside">
                 <img src="{{ asset('img/e99395e98ea663a8400f40e836a71b8c4e773b01.jpg') }}" alt="送信" class="send-icon">
             </button>
@@ -156,6 +159,14 @@
                 preview.style.display = 'none';
             }
         });
+
+        const isBuyer = {{ $isBuyer ? 'true' : 'false' }};
+        const shouldShowModal = {{ $showRatingModal ? 'true' : 'false' }};
+        const ratingSubmitted = {{ session('rating_submitted') ? 'true' : 'false' }};
+
+        if (!isBuyer && shouldShowModal && !ratingSubmitted) {
+            openModal();
+        }
 
         const messageContainer = document.getElementById('tradeMessages');
         if (messageContainer) {

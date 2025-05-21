@@ -1,17 +1,14 @@
 @extends('layouts.default')
 
-<!-- タイトル -->
 @section('title','購入手続き')
 
-<!-- css読み込み -->
 @section('css')
 <link rel="stylesheet" href="{{ asset('/css/purchase.css') }}">
 @endsection
 
-<!-- 本体 -->
 @section('content')
-
 @include('components.header')
+
 <div class="container">
     <form class="buy" id="stripe-form" action="/purchase/{{ $item->id }}" method="post">
         <div class="buy__left">
@@ -24,6 +21,7 @@
                     <p class="item__price">¥ {{ number_format($item->price) }}</p>
                 </div>
             </div>
+
             <div class="purchases">
                 <div class="purchase">
                     <div class="purchase__flex">
@@ -40,13 +38,22 @@
                         <h3 class="purchase__title">配送先</h3>
                         <button type="button" id="destination__update">変更する</button>
                     </div>
+
                     <div class="purchase__value">
-                        <label>〒 <input class="input_destination" name="destination_postcode" value="{{ $user->profile->postcode }}" readonly></label><br>
-                        <input class="input_destination" name="destination_address" value="{{ $user->profile->address }}" readonly><br>
-                        @if (isset($user->profile->building))
-                        <input class="input_destination" name="destination_building" value="{{ $user->profile->building }}" readonly>
+                        <label>〒 
+                            <input class="input_destination" name="destination_postcode" 
+                                   value="{{ optional($user->profile)->postcode }}" readonly>
+                        </label><br>
+
+                        <input class="input_destination" name="destination_address" 
+                               value="{{ optional($user->profile)->address }}" readonly><br>
+
+                        @if (optional($user->profile)->building)
+                            <input class="input_destination" name="destination_building" 
+                                   value="{{ $user->profile->building }}" readonly>
                         @endif
                     </div>
+
                     <div class="setting__flex">
                         <button type="button" id="destination__setting">変更完了</button>
                     </div>
@@ -59,7 +66,9 @@
                 <table>
                     <tr>
                         <th class="table__header">商品代金</th>
-                        <td id="item__price" class="table__data" value="{{ number_format($item->price) }}">¥ {{ number_format($item->price) }}</td>
+                        <td id="item__price" class="table__data" value="{{ number_format($item->price) }}">
+                            ¥ {{ number_format($item->price) }}
+                        </td>
                     </tr>
                     <tr>
                         <th class="table__header">支払い方法</th>
@@ -67,13 +76,15 @@
                     </tr>
                 </table>
             </div>
+
             @csrf
+
             @if ($item->sold())
-            <button class="btn disable" disabled>売り切れました</button>
+                <button class="btn disable" disabled>売り切れました</button>
             @elseif ($item->mine())
-            <button class="btn disable" disabled>購入できません</button>
+                <button class="btn disable" disabled>購入できません</button>
             @else
-            <button id="purchase_btn" class="btn">購入する</button>
+                <button id="purchase_btn" class="btn">購入する</button>
             @endif
         </div>
     </form>

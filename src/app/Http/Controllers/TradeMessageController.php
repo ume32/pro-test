@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\TradeMessageRequest;
 use App\Models\Item;
 use App\Models\TradeMessage;
@@ -23,9 +22,10 @@ class TradeMessageController extends Controller
             $query->where('user_id', Auth::id())->whereHas('soldItem');
         })->get();
 
-        $messages = TradeMessage::where('item_id', $item->id)->orderBy('created_at')->get();
+        $messages = TradeMessage::where('item_id', $item->id)
+            ->orderBy('created_at')->get();
 
-        // 未読メッセージにread_atを付与
+        // 未読メッセージに read_at を追加
         TradeMessage::where('item_id', $item->id)
             ->where('user_id', '!=', Auth::id())
             ->whereNull('read_at')
@@ -34,7 +34,35 @@ class TradeMessageController extends Controller
         $averageRatingRaw = TradeRating::where('ratee_id', $item->user->id)->avg('rating');
         $averageRating = $averageRatingRaw ? round($averageRatingRaw, 1) : null;
 
-        return view('trade.conversation', compact('item', 'dealingItems', 'messages', 'averageRating'));
+        // ✅ モーダル表示制御
+        $alreadyRated = TradeRating::where('item_id', $item->id)
+            ->where('rater_id', Auth::id())
+            ->exists();
+
+        $shouldShowRatingModal = false;
+
+        $buyerId = optional($item->soldItem)->user_id;
+
+        $buyerHasRated = TradeRating::where('item_id', $item->id)
+            ->where('rater_id', $buyerId)
+            ->exists();
+
+        if (
+            $item->user_id === Auth::id() &&  // 自分が出品者
+            !$alreadyRated &&                // まだ自分が評価していない
+            $buyerId &&                      // 購入者が存在していて
+            $buyerHasRated                   // 購入者が評価済み
+        ) {
+            $shouldShowRatingModal = true;
+        }
+
+        return view('trade.conversation', [
+            'item' => $item,
+            'dealingItems' => $dealingItems,
+            'messages' => $messages,
+            'averageRating' => $averageRating,
+            'showRatingModal' => $shouldShowRatingModal
+        ]);
     }
 
     public function store(TradeMessageRequest $request, $item_id)
@@ -48,9 +76,9 @@ class TradeMessageController extends Controller
         }
 
         TradeMessage::create([
-            'item_id' => $item_id,
-            'user_id' => Auth::id(),
-            'message' => $request->message,
+            'item_id'    => $item_id,
+            'user_id'    => Auth::id(),
+            'message'    => $request->message,
             'image_path' => $image_path,
         ]);
 

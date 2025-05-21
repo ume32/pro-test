@@ -339,3 +339,59 @@ body {
 .error-messages li {
     margin: 4px 0;
 }
+
+/* ===== 編集画面（edit.blade.php） ===== */
+.edit-container {
+    padding: 40px;
+    background-color: #fff;
+    min-height: 80vh;
+}
+
+.edit-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.edit-form {
+    margin-top: 20px;
+}
+
+.edit-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.edit-form textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 120px;
+}
+
+.edit-form-actions {
+    margin-top: 30px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.edit-form-actions .btn-submit {
+    background-color: #ff8c8c;
+    color: white;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.edit-form-actions .btn-cancel {
+    color: #666;
+    text-decoration: underline;
+    font-size: 14px;
+}
