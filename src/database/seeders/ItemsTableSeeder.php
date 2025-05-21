@@ -9,11 +9,6 @@ use App\Models\Like;
 
 class ItemsTableSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
         $params = [
@@ -23,7 +18,7 @@ class ItemsTableSeeder extends Seeder
                 'brand' => 'Rolax',
                 'description' => 'スタイリッシュなデザインのメンズ腕時計',
                 'img_url' => 'public/img/mens_clock.jpg',
-                'user_id' => 2,
+                'user_id' => 1, // ← ユーザー1
                 'condition_id' => Condition::$UNUSED,
             ],
             [
@@ -32,7 +27,7 @@ class ItemsTableSeeder extends Seeder
                 'brand' => '西芝',
                 'description' => '高速で信頼性の高いハードディスク',
                 'img_url' => 'public/img/hard_disk.jpg',
-                'user_id' => 2,
+                'user_id' => 1, // ← ユーザー1
                 'condition_id' => Condition::$HARMLESS,
             ],
             [
@@ -41,7 +36,7 @@ class ItemsTableSeeder extends Seeder
                 'brand' => '',
                 'description' => '新鮮な玉ねぎ3束のセット',
                 'img_url' => 'public/img/onion.jpg',
-                'user_id' => 2,
+                'user_id' => 1, // ← ユーザー1
                 'condition_id' => Condition::$HARMED,
             ],
             [
@@ -50,7 +45,7 @@ class ItemsTableSeeder extends Seeder
                 'brand' => '',
                 'description' => 'クラシックなデザインの革靴',
                 'img_url' => 'public/img/leather_shoes.jpg',
-                'user_id' => 2,
+                'user_id' => 1, // ← ユーザー1
                 'condition_id' => Condition::$BAD_CONDITION,
             ],
             [
@@ -59,7 +54,7 @@ class ItemsTableSeeder extends Seeder
                 'brand' => '',
                 'description' => '高性能なノートパソコン',
                 'img_url' => 'public/img/laptop_PC.jpg',
-                'user_id' => 2,
+                'user_id' => 1, // ← ユーザー1
                 'condition_id' => Condition::$UNUSED,
             ],
             [
@@ -68,7 +63,7 @@ class ItemsTableSeeder extends Seeder
                 'brand' => '',
                 'description' => '高音質のレコーディング用マイク',
                 'img_url' => 'public/img/mic.jpg',
-                'user_id' => 2,
+                'user_id' => 2, // ← ユーザー2
                 'condition_id' => Condition::$HARMLESS,
             ],
             [
@@ -77,7 +72,7 @@ class ItemsTableSeeder extends Seeder
                 'brand' => '',
                 'description' => 'おしゃれなショルダーバッグ',
                 'img_url' => 'public/img/shoulder_bag.jpg',
-                'user_id' => 1,
+                'user_id' => 2, // ← ユーザー2
                 'condition_id' => Condition::$HARMED,
             ],
             [
@@ -86,7 +81,7 @@ class ItemsTableSeeder extends Seeder
                 'brand' => '',
                 'description' => '使いやすいタンブラー',
                 'img_url' => 'public/img/tumbler.jpg',
-                'user_id' => 1,
+                'user_id' => 2, // ← ユーザー2
                 'condition_id' => Condition::$BAD_CONDITION,
             ],
             [
@@ -95,7 +90,7 @@ class ItemsTableSeeder extends Seeder
                 'brand' => 'Starbacks',
                 'description' => '手動のコーヒーミル',
                 'img_url' => 'public/img/coffer_mill.jpg',
-                'user_id' => 1,
+                'user_id' => 2, // ← ユーザー2
                 'condition_id' => Condition::$UNUSED,
             ],
             [
@@ -104,16 +99,16 @@ class ItemsTableSeeder extends Seeder
                 'brand' => '',
                 'description' => '便利なメイクアップセット',
                 'img_url' => 'public/img/make_set.jpg',
-                'user_id' => 1,
+                'user_id' => 2, // ← ユーザー2
                 'condition_id' => Condition::$HARMLESS,
             ],
         ];
 
-        $range = count($params);
-        for ($i = 0; $i < $range; $i++) {
-            Item::create($params[$i]);
+        foreach ($params as $param) {
+            Item::create($param);
         }
 
+        // Likeも一応残してOK
         Like::create([
             'user_id' => 1,
             'item_id' => 1,

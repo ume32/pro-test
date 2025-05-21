@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Item;
 use App\Models\TradeMessage;
-use App\Models\User;
-use App\Models\Profile;
+use App\Models\TradeRating; // ★ 平均評価取得に使用
 use Carbon\Carbon;
 
 class TradeMessageController extends Controller
@@ -19,7 +19,7 @@ class TradeMessageController extends Controller
     {
         $item = Item::with('user')->findOrFail($item_id);
 
-        // サイドバー用に自分が関わる取引中商品を取得
+        // サイドバー用：自分が関わる取引中商品一覧
         $dealingItems = Item::where(function ($query) {
             $query->where('user_id', Auth::id())
                 ->orWhereHas('tradeMessages', function ($q) {
@@ -27,18 +27,27 @@ class TradeMessageController extends Controller
                 });
         })->get();
 
-        // チャット一覧（最新順）
+        // メッセージ一覧
         $messages = TradeMessage::where('item_id', $item->id)
             ->orderBy('created_at')
             ->get();
 
-        // 未読 → 既読に更新
+        // 自分以外の未読メッセージ → 既読に更新
         TradeMessage::where('item_id', $item->id)
             ->where('user_id', '!=', Auth::id())
             ->whereNull('read_at')
             ->update(['read_at' => Carbon::now()]);
 
-        return view('trade.show', compact('item', 'dealingItems', 'messages'));
+        // ★ 平均評価（小数点第1位まで）
+        $averageRatingRaw = TradeRating::where('ratee_id', $item->user->id)->avg('rating');
+        $averageRating = $averageRatingRaw ? round($averageRatingRaw, 1) : null;
+
+        return view('trade.conversation', compact(
+            'item',
+            'dealingItems',
+            'messages',
+            'averageRating'
+        ));
     }
 
     /**
@@ -56,10 +65,9 @@ class TradeMessageController extends Controller
             'image.mimes' => '「.png」または「.jpeg」形式でアップロードしてください',
         ]);
 
-        $image_path = null;
-        if ($request->hasFile('image')) {
-            $image_path = $request->file('image')->store('public/trade_images');
-        }
+        $image_path = $request->hasFile('image')
+            ? $request->file('image')->store('public/trade_images')
+            : null;
 
         TradeMessage::create([
             'item_id' => $item_id,
