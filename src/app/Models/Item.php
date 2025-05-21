@@ -20,6 +20,7 @@ class Item extends Model
         'condition_id',
     ];
 
+    // ユーザーとの関連
     public function user()
     {
         return $this->belongsTo('App\Models\User');
@@ -47,15 +48,17 @@ class Item extends Model
 
     public function categories()
     {
-        $categories = $this->categoryItem->map(function ($item) {
+        return $this->categoryItem->map(function ($item) {
             return $item->category;
         });
-        return $categories;
     }
 
     public function liked()
     {
-        return Like::where(['item_id' => $this->id, 'user_id' => Auth::id()])->exists();
+        return Like::where([
+            'item_id' => $this->id,
+            'user_id' => Auth::id()
+        ])->exists();
     }
 
     public function likeCount()
@@ -65,8 +68,7 @@ class Item extends Model
 
     public function getComments()
     {
-        $comments = Comment::where('item_id', $this->id)->get();
-        return $comments;
+        return Comment::where('item_id', $this->id)->get();
     }
 
     public function sold()
@@ -82,5 +84,18 @@ class Item extends Model
     public static function scopeItem($query, $item_name)
     {
         return $query->where('name', 'like', '%' . $item_name . '%');
+    }
+
+    // ✅ 追加：取引チャット関連
+    public function tradeMessages()
+    {
+        return $this->hasMany(TradeMessage::class);
+    }
+
+    public function unreadMessages()
+    {
+        return $this->tradeMessages()
+            ->where('user_id', '!=', Auth::id())
+            ->whereNull('read_at'); // 既読でないメッセージのみ
     }
 }
