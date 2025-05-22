@@ -65,18 +65,19 @@ https://docs.stripe.com/payments/checkout?locale=ja-JP
 | updated_at | timestamp |  |  |  |  |
 
 ### itemsテーブル
-| カラム名 | 型 | primary key | unique key | not null | foreign key |
-| --- | --- | --- | --- | --- | --- |
-| id | bigint | ◯ |  | ◯ |  |
-| user_id | bigint |  |  | ◯ | users(id) |
-| condition_id | bigint |  |  | ◯ | condtions(id) |
-| name | varchar(255) |  |  | ◯ |  |
-| price | int |  |  | ◯ |  |
-| brand | varchar(255) |  |  |  |  |
-| description | varchar(255) |  |  | ◯ |  |
-| img_url | varchar(255) |  |  | ◯ |  |
-| created_at | timestamp |  |  |  |  |
-| updated_at | timestamp |  |  |  |  |
+| カラム名          | 型            | primary key | unique key | not null | foreign key    |
+| ------------- | ------------ | ----------- | ---------- | -------- | -------------- |
+| id            | bigint       | ◯           |            | ◯        |                |
+| user\_id      | bigint       |             |            | ◯        | users(id)      |
+| condition\_id | bigint       |             |            | ◯        | conditions(id) |
+| name          | varchar(255) |             |            | ◯        |                |
+| price         | int          |             |            | ◯        |                |
+| brand         | varchar(255) |             |            |          |                |
+| description   | varchar(255) |             |            | ◯        |                |
+| img\_url      | varchar(255) |             |            | ◯        |                |
+| is\_dealing   | boolean      |             |            |          |                |
+| created\_at   | timestamp    |             |            |          |                |
+| updated\_at   | timestamp    |             |            |          |                |
 
 ### commentsテーブル
 | カラム名 | 型 | primary key | unique key | not null | foreign key |
@@ -130,6 +131,31 @@ https://docs.stripe.com/payments/checkout?locale=ja-JP
 | condition | varchar(255) |  |  | ◯ |  |
 | created_at | timestamp |  |  |  |  |
 | updated_at | timestamp |  |  |  |  |
+
+### trade_messagesテーブル
+| カラム名        | 型            | primary key | unique key | not null | foreign key |
+| ----------- | ------------ | ----------- | ---------- | -------- | ----------- |
+| id          | bigint       | ◯           |            | ◯        |             |
+| item\_id    | bigint       |             |            | ◯        | items(id)   |
+| user\_id    | bigint       |             |            | ◯        | users(id)   |
+| message     | text         |             |            |          |             |
+| image\_path | varchar(255) |             |            |          |             |
+| read\_at    | timestamp    |             |            |          |             |
+| created\_at | timestamp    |             |            |          |             |
+| updated\_at | timestamp    |             |            |          |             |
+
+### trade_ratingsテーブル
+| カラム名        | 型         | primary key | unique key | not null | foreign key |
+| ----------- | --------- | ----------- | ---------- | -------- | ----------- |
+| id          | bigint    | ◯           |            | ◯        |             |
+| item\_id    | bigint    |             |            | ◯        | items(id)   |
+| rater\_id   | bigint    |             |            | ◯        | users(id)   |
+| ratee\_id   | bigint    |             |            | ◯        | users(id)   |
+| rating      | tinyint   |             |            | ◯        |             |
+| created\_at | timestamp |             |            |          |             |
+| updated\_at | timestamp |             |            |          |             |
+
+
 
 ##ER図
 ![ER図](src/graph.png)
