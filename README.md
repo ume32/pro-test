@@ -195,7 +195,7 @@ php artisan migrate:fresh --env=testing
 本アプリケーションでは、`laravel_user` ユーザーがデータベースにアクセスするための権限を持っています。このユーザーに対する権限付与は、以下のコマンドを実行して設定します。
 
 ```sql
-GRANT ALL PRIVILEGES ON test_database.* TO 'laravel_user'@'%' IDENTIFIED BY 'laravel_pass';
+GRANT ALL PRIVILEGES ON test_database.* TO 'laravel_user'@'%';
 FLUSH PRIVILEGES;
 ```
 
