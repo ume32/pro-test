@@ -17,7 +17,7 @@ class UsersTableSeeder extends Seeder
     public function run()
     {
         $param = [
-            'name' => '一般ユーザ1',
+            'name' => 'ユーザー1',
             'email' => 'user1@gmail.com',
             'email_verified_at' => Carbon::now(),
             'password' => Hash::make('password'),
@@ -25,7 +25,7 @@ class UsersTableSeeder extends Seeder
         User::create($param);
 
         $param = [
-            'name' => '一般ユーザ2',
+            'name' => 'ユーザー2',
             'email' => 'user2@gmail.com',
             'email_verified_at' => Carbon::now(),
             'password' => Hash::make('password'),
@@ -33,7 +33,7 @@ class UsersTableSeeder extends Seeder
         User::create($param);
 
         $param = [
-            'name' => '一般ユーザ3',
+            'name' => 'ユーザー3',
             'email' => 'user3@gmail.com',
             'email_verified_at' => Carbon::now(),
             'password' => Hash::make('password'),
