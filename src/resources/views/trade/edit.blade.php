@@ -12,7 +12,6 @@
 <div class="trade-content edit-container">
     <h2 class="edit-title">メッセージを編集</h2>
 
-    {{-- エラー表示 --}}
     @if ($errors->any())
         <div class="error-messages">
             <ul>

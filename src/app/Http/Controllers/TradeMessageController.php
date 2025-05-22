@@ -25,7 +25,6 @@ class TradeMessageController extends Controller
         $messages = TradeMessage::where('item_id', $item->id)
             ->orderBy('created_at')->get();
 
-        // 未読メッセージに read_at を追加
         TradeMessage::where('item_id', $item->id)
             ->where('user_id', '!=', Auth::id())
             ->whereNull('read_at')
@@ -34,7 +33,6 @@ class TradeMessageController extends Controller
         $averageRatingRaw = TradeRating::where('ratee_id', $item->user->id)->avg('rating');
         $averageRating = $averageRatingRaw ? round($averageRatingRaw, 1) : null;
 
-        // ✅ モーダル表示制御
         $alreadyRated = TradeRating::where('item_id', $item->id)
             ->where('rater_id', Auth::id())
             ->exists();
@@ -48,10 +46,10 @@ class TradeMessageController extends Controller
             ->exists();
 
         if (
-            $item->user_id === Auth::id() &&  // 自分が出品者
-            !$alreadyRated &&                // まだ自分が評価していない
-            $buyerId &&                      // 購入者が存在していて
-            $buyerHasRated                   // 購入者が評価済み
+            $item->user_id === Auth::id() &&
+            !$alreadyRated &&
+            $buyerId &&
+            $buyerHasRated
         ) {
             $shouldShowRatingModal = true;
         }

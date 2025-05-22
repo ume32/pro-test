@@ -61,7 +61,6 @@ class PurchaseController extends Controller
 
     public function success($item_id, Request $request)
     {
-        // 必要なクエリパラメータがあるか確認
         if (!$request->user_id || !$request->amount || !$request->sending_postcode || !$request->sending_address) {
             throw new Exception("Missing query parameters");
         }
@@ -69,14 +68,12 @@ class PurchaseController extends Controller
         $item = Item::findOrFail($item_id);
         $stripe = new StripeClient(config('services.stripe.secret'));
 
-        // 決済を最終確認（実際の運用では Webhook を使うべき）
         $stripe->charges->create([
             'amount' => $request->amount,
             'currency' => 'jpy',
-            'source' => 'tok_visa', // テスト用トークン
+            'source' => 'tok_visa',
         ]);
 
-        // 購入履歴に登録
         SoldItem::create([
             'user_id' => $request->user_id,
             'item_id' => $item_id,
@@ -85,7 +82,6 @@ class PurchaseController extends Controller
             'sending_building' => $request->sending_building ?? null,
         ]);
 
-        // ★ is_dealing を true に更新 → 取引中フラグ
         $item->is_dealing = true;
         $item->save();
 

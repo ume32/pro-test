@@ -1,4 +1,3 @@
-/* ===== ベース設定 ===== */
 html,
 body {
     margin: 0;
@@ -7,7 +6,6 @@ body {
     height: 100%;
 }
 
-/* ===== 全体レイアウト ===== */
 .trade-container {
     display: flex;
     height: calc(100vh - 80px);
@@ -52,7 +50,6 @@ body {
     overflow: hidden;
 }
 
-/* ===== ヘッダー部分 ===== */
 .trade-header {
     display: flex;
     justify-content: space-between;
@@ -82,7 +79,6 @@ body {
     cursor: pointer;
 }
 
-/* ===== 商品情報 ===== */
 .trade-item {
     display: flex;
     align-items: center;
@@ -110,7 +106,6 @@ body {
     margin-top: 4px;
 }
 
-/* ===== メッセージ一覧 ===== */
 .trade-messages {
     flex: 1;
     overflow-y: auto;
@@ -169,7 +164,6 @@ body {
     display: block;
 }
 
-/* ===== 編集・削除リンク ===== */
 .actions {
     font-size: 12px;
     color: #666;
@@ -190,7 +184,6 @@ body {
     font-family: inherit;
 }
 
-/* ===== 入力フォーム（下部固定） ===== */
 .trade-form {
     display: flex;
     align-items: center;
@@ -246,7 +239,6 @@ body {
     height: 28px;
 }
 
-/* ===== モーダル ===== */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -281,7 +273,6 @@ body {
     margin-bottom: 15px;
 }
 
-/* ===== スター評価 ===== */
 .stars {
     display: flex;
     justify-content: center;
@@ -304,7 +295,6 @@ body {
     color: #ffdd00;
 }
 
-/* ===== モーダル送信ボタン ===== */
 .btn-submit {
     background-color: #ff8c8c;
     color: white;
@@ -315,7 +305,6 @@ body {
     font-weight: bold;
 }
 
-/* ===== 非表示ユーティリティ ===== */
 .hidden {
     display: none;
 }
@@ -340,7 +329,6 @@ body {
     margin: 4px 0;
 }
 
-/* ===== 編集画面（edit.blade.php） ===== */
 .edit-container {
     padding: 40px;
     background-color: #fff;

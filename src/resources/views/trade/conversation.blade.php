@@ -21,7 +21,7 @@
         <p class="sidebar-title">その他の取引</p>
         @foreach ($dealingItems as $sideItem)
             <a href="{{ route('trade.show', ['item_id' => $sideItem->id]) }}"
-               class="sidebar-item {{ $item->id === $sideItem->id ? 'active' : '' }}">
+                class="sidebar-item {{ $item->id === $sideItem->id ? 'active' : '' }}">
                 {{ $sideItem->name }}
             </a>
         @endforeach
@@ -78,7 +78,6 @@
             @endforeach
         </div>
 
-        {{-- エラー表示 --}}
         @if ($errors->any())
             <div class="error-messages">
                 <ul>
@@ -89,7 +88,6 @@
             </div>
         @endif
 
-        {{-- メッセージ投稿フォーム --}}
         <form method="POST" action="{{ route('trade.store', ['item_id' => $item->id]) }}" enctype="multipart/form-data" class="trade-form" id="messageForm">
             @csrf
             <input type="text" name="message" placeholder="取引メッセージを記入してください" value="">
@@ -106,7 +104,6 @@
     </div>
 </div>
 
-{{-- モーダル --}}
 <div class="modal-overlay hidden" id="ratingModal">
     <div class="modal">
         <h2>取引が完了しました。</h2>

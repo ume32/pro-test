@@ -51,7 +51,6 @@ class UserController extends Controller
     {
         $user = User::withAvg('receivedRatings', 'rating')->find(Auth::id());
 
-        // ✅ 常に dealCount を算出（出品者 + 購入者 両方）
         $itemsAsSeller = Item::where('user_id', $user->id)
             ->where('is_dealing', true)
             ->get();
@@ -65,7 +64,6 @@ class UserController extends Controller
 
         $dealCount = $allDealItems->sum(fn($item) => $item->unreadMessages()->count());
 
-        // 表示する items の切り替え
         if ($request->page === 'buy') {
             $items = SoldItem::where('user_id', $user->id)
                 ->get()
@@ -80,7 +78,6 @@ class UserController extends Controller
             $items = Item::where('user_id', $user->id)->get();
         }
 
-        // 表示しているアイテムにも unread_count を追加しておく（画像側で表示用）
         foreach ($items as $item) {
             if (method_exists($item, 'unreadMessages') && !isset($item->unread_count)) {
                 $item->unread_count = $item->unreadMessages()->count();
