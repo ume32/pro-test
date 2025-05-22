@@ -189,6 +189,15 @@ php artisan migrate:fresh --env=testing
 ./vendor/bin/phpunit
 ```
 ※.env.testingにもStripeのAPIキーを設定してください。  
+## 権限設定
+
+### データベースユーザー権限
+本アプリケーションでは、`laravel_user` ユーザーがデータベースにアクセスするための権限を持っています。このユーザーに対する権限付与は、以下のコマンドを実行して設定します。
+
+```sql
+GRANT ALL PRIVILEGES ON test_database.* TO 'laravel_user'@'%' IDENTIFIED BY 'laravel_pass';
+FLUSH PRIVILEGES;
+```
 
 ## 使用技術
 
