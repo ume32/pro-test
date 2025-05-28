@@ -24,7 +24,7 @@ class PurchaseController extends Controller
     public function purchase($item_id, Request $request)
     {
         $item = Item::findOrFail($item_id);
-        $stripe = new StripeClient(config('services.stripe.secret'));
+        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
 
         $user_id = Auth::id();
         $amount = $item->price;
@@ -66,7 +66,7 @@ class PurchaseController extends Controller
         }
 
         $item = Item::findOrFail($item_id);
-        $stripe = new StripeClient(config('services.stripe.secret'));
+        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
 
         $stripe->charges->create([
             'amount' => $request->amount,
